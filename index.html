@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Panel de Control · Monedas y Aduana</title>
+<style>
+  :root{
+    --bg:#eef2f9; --surface:#fff; --surface-2:#f7f9fd; --ink:#0b1220; --muted:#5b6b82;
+    --line:#dfe6f0; --brand:#1d4ed8; --brand-soft:#e8efff; --navy:#0b1e3f;
+    --teal:#0d9488; --amber:#d97706; --ok:#0f766e; --ok-soft:#e6f7f3; --warn:#b45309; --warn-soft:#fef4e6;
+    --purple:#7c3aed;
+    --radius:18px; --shadow:0 1px 2px rgba(15,23,42,.05), 0 14px 34px -22px rgba(11,30,63,.55);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; color:var(--ink); -webkit-font-smoothing:antialiased;
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1100px 520px at 8% -12%, #dbe7ff 0%, transparent 62%), var(--bg);
+    min-height:100vh;
+  }
+  .wrap{max-width:1220px;margin:0 auto;padding:0 20px}
+  h1,h2,h3{margin:0}
+
+  .hero{background:linear-gradient(135deg,#0b1e3f 0%,#12306b 55%,#1d4ed8 100%);color:#fff;
+        padding:26px 0 30px;border-radius:0 0 26px 26px;box-shadow:0 18px 40px -28px rgba(11,30,63,.95)}
+  .hero-in{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;justify-content:space-between}
+  .eyebrow{margin:0;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#9dc0ff;font-weight:700}
+  .hero h1{margin:4px 0 8px;font-size:30px;letter-spacing:.16em;font-weight:800}
+  .sub{margin:0;color:#c7d7f5;font-size:13.5px;max-width:56ch;line-height:1.5}
+  .hero-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .chip{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);
+        padding:9px 15px;border-radius:999px;font-size:13px;font-variant-numeric:tabular-nums}
+
+  .btn{cursor:pointer;border:1px solid transparent;border-radius:12px;padding:10px 16px;
+       font-size:13.5px;font-weight:700;font-family:inherit;transition:.16s;line-height:1}
+  .btn.light{background:rgba(255,255,255,.14);color:#fff;border-color:rgba(255,255,255,.26)}
+  .btn.light:hover{background:rgba(255,255,255,.26)}
+  .btn.light:disabled{opacity:.5;cursor:wait}
+  .btn.ghost{background:var(--brand-soft);color:var(--brand);border-color:#c9d9ff}
+  .btn.ghost:hover{background:#d8e5ff}
+  .link{background:none;border:0;color:var(--brand);font:inherit;font-weight:700;cursor:pointer;padding:0 4px;text-decoration:underline}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+        box-shadow:var(--shadow);padding:20px;margin-top:20px}
+  .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+  .card-head h2{font-size:15.5px;letter-spacing:.02em}
+  .pill{font-size:11.5px;font-weight:700;padding:6px 12px;border-radius:999px;
+        background:#eef2f9;color:var(--muted);border:1px solid var(--line);white-space:nowrap}
+  .pill.ok{background:var(--ok-soft);color:var(--ok);border-color:#bde9e0}
+  .pill.warn{background:var(--warn-soft);color:var(--warn);border-color:#f4dcb4}
+  .pill.load{background:#eef2f9;color:var(--brand);border-color:#c9d9ff}
+  .pill.purple{background:#f3e8ff;color:var(--purple);border-color:#d8b4fe}
+  .pill.blue{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe}
+
+  .ind-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:6px}
+  .ind-head label{margin-bottom:0!important}
+  .meta-mes{font-size:11px;color:var(--muted);margin-top:7px;display:flex;align-items:center;gap:5px;line-height:1.4}
+  .meta-mes b{color:var(--navy)}
+  .meta-mes .vigencia{color:var(--teal);font-weight:700}
+
+  .calc-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+  .calc-head h3{margin:0;font-size:14.5px;display:flex;align-items:center;gap:6px}
+  .btn-inv{
+    border:1px solid #c9d9ff;background:var(--brand-soft);color:var(--brand);
+    font-family:inherit;font-size:11px;font-weight:700;padding:5px 9px;
+    border-radius:8px;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:4px;
+    line-height:1;
+  }
+  .btn-inv:hover{background:#dbe7ff;border-color:var(--brand)}
+  .btn-inv.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+
+  .seg-control{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:3px}
+  .seg-btn{border:0;background:none;font-family:inherit;font-size:12px;font-weight:700;color:var(--muted);padding:6px 12px;border-radius:8px;cursor:pointer;transition:.15s;white-space:nowrap}
+  .seg-btn:hover{color:var(--ink)}
+  .seg-btn.active{background:#fff;color:var(--brand);box-shadow:0 1px 3px rgba(15,23,42,.1)}
+
+  .ind-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .ind{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .ind label{display:block;font-size:11px;color:var(--muted);font-weight:800;
+             margin-bottom:8px;text-transform:uppercase;letter-spacing:.07em}
+  .ind input{width:100%;font-size:19px;font-weight:800;font-family:inherit;border:1px solid var(--line);
+             background:#fff;border-radius:10px;padding:9px 11px;color:var(--ink);
+             font-variant-numeric:tabular-nums;transition:.15s}
+  .ind input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px #dbe7ff}
+  .ind .meta{font-size:11px;color:var(--muted);margin-top:7px;line-height:1.4}
+  .ind .meta b{color:var(--ink)}
+  /* Bloqueo visual del campo UF cuando está en modo manual */
+  .ind input.manual{
+    border-color:var(--purple);
+    background:#faf5ff;
+    box-shadow:0 0 0 3px #f3e8ff;
+  }
+
+  .fecha-row{display:flex;gap:6px;align-items:stretch}
+  .fecha-row input[type="date"]{
+    flex:1;font-size:15px;font-weight:700;cursor:pointer;
+    min-height:44px;padding:10px 12px;
+    background:#fff;border:1px solid var(--line);border-radius:10px;color:var(--ink);
+  }
+  .fecha-row input[type="date"]:hover{border-color:var(--brand)}
+  .fecha-row input[type="date"]:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px #dbe7ff}
+  .btn-fecha{
+    cursor:pointer;font-family:inherit;font-size:12px;font-weight:800;
+    padding:0 12px;border-radius:10px;border:1px solid #c9d9ff;
+    background:var(--brand-soft);color:var(--brand);white-space:nowrap;transition:.15s;
+  }
+  .btn-fecha:hover{background:#d8e5ff}
+
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+  .calc{background:#fff;border:1px solid var(--line);border-top:4px solid var(--brand);
+        border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;
+        display:flex;flex-direction:column;gap:13px}
+  .calc.b{border-top-color:var(--teal)} .calc.c{border-top-color:var(--amber)}
+  .calc h3{font-size:14.5px;display:flex;align-items:center;gap:8px}
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field label{font-size:11.5px;color:var(--muted);font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+  .field input,.field select{font-size:15px;font-weight:700;font-family:inherit;border:1px solid var(--line);
+        background:#fff;border-radius:11px;padding:11px 12px;color:var(--ink);
+        font-variant-numeric:tabular-nums;transition:.15s;width:100%}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px #dbe7ff}
+  .ro{background:var(--surface-2);border:1px dashed #cdd8e8;border-radius:11px;padding:11px 12px;
+      font-weight:800;font-size:15px;font-variant-numeric:tabular-nums}
+  .total{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--navy);
+         color:#fff;padding:14px 16px;border-radius:13px}
+  .total span{font-size:12px;color:#a9bde0;font-weight:700}
+  .total strong{font-size:20px;font-variant-numeric:tabular-nums;letter-spacing:-.02em;text-align:right}
+  .sub{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--muted)}
+  .sub b{color:var(--ink);font-variant-numeric:tabular-nums}
+
+  .cif-card{border-top:4px solid var(--purple)}
+  .cif-inputs{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+  .cif-flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;background:var(--surface-2);
+    border:1px solid var(--line);border-radius:14px;padding:14px}
+  .cif-node{display:flex;flex-direction:column;gap:4px;padding:10px 14px;background:#fff;
+    border:1px solid var(--line);border-radius:10px;font-variant-numeric:tabular-nums;flex:1 1 110px;min-width:110px}
+  .cif-node span{font-size:10px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.07em}
+  .cif-node b{font-size:15px;color:var(--ink);word-break:break-word}
+  .cif-op{display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--muted);font-weight:700;padding:0 4px;flex:0 0 auto}
+  .cif-final{flex:1.3 1 180px;min-width:180px;padding:12px 18px;background:var(--navy);color:#fff;
+    border-radius:12px;display:flex;flex-direction:column;gap:4px;justify-content:center;text-align:right}
+  .cif-final span{font-size:11px;color:#a9bde0;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+  .cif-final strong{font-size:22px;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+
+  .code-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .search-row{display:flex;gap:10px;margin-bottom:14px}
+  .search-row input{flex:1;font:inherit;font-size:14px;padding:12px 14px;border-radius:12px;
+        border:1px solid var(--line);background:#fff;transition:.15s}
+  .search-row input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px #dbe7ff}
+  .code-list{max-height:430px;overflow:auto;display:flex;flex-direction:column;gap:8px;padding-right:6px}
+  .code-item{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;cursor:pointer;
+        background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 13px;font:inherit;transition:.14s}
+  .code-item:hover{border-color:#b9cdf2;background:#f7faff;transform:translateX(2px)}
+  .code-item.active{border-color:var(--brand);background:var(--brand-soft);box-shadow:0 0 0 3px #e0eaff}
+  .code-item .c{font-weight:800;font-size:13.5px;color:var(--brand);min-width:52px;font-variant-numeric:tabular-nums}
+  .code-item .d{font-size:12.8px;line-height:1.4;color:var(--ink)}
+  .code-item .f{font-size:11px;color:var(--muted);margin-top:3px}
+  .code-detail{background:var(--surface-2);border:1px solid var(--line);border-radius:15px;padding:20px}
+  .detail-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .code-badge{font-size:22px;font-weight:800;color:var(--brand);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .code-detail h3{font-size:16px;line-height:1.4;margin:0 0 16px}
+  .dl{display:flex;flex-direction:column;gap:12px;margin:0}
+  .dl dt{font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:800;margin-bottom:3px}
+  .dl dd{margin:0;font-size:13.5px;line-height:1.5;color:var(--ink)}
+  .empty{color:var(--muted);font-size:13px;padding:10px 0}
+
+  .foot{padding:26px 20px 40px;color:var(--muted);font-size:11.5px;line-height:1.6;text-align:center}
+
+  @media (max-width:980px){
+    .grid-3{grid-template-columns:1fr}
+    .code-grid{grid-template-columns:1fr}
+    .ind-grid{grid-template-columns:repeat(2,1fr)}
+    .cif-inputs{grid-template-columns:1fr}
+  }
+  @media (max-width:560px){
+    .ind-grid{grid-template-columns:1fr}
+    .hero h1{font-size:22px;letter-spacing:.1em}
+    .wrap{padding:0 14px}
+    .cif-op{padding:0}
+    .cif-final{text-align:left}
+  }
+
+  @media print{
+    body{background:#fff}
+    .hero{background:#fff;color:#0b1220;box-shadow:none;border-radius:0;border-bottom:2px solid #0b1220}
+    .hero h1{color:#0b1220} .sub,.eyebrow{color:#334155}
+    .no-print,.hero-actions,.btn,.search-row,.btn-fecha{display:none!important}
+    .card,.calc{box-shadow:none;border:1px solid #cbd5e1;break-inside:avoid}
+    .code-list{max-height:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap hero-in">
+    <div>
+      <p class="eyebrow">Servicios Aduaneros · Chile</p>
+      <h1>PANEL DE CONTROL</h1>
+      <p class="sub">Tipos de cambio en tiempo real, conversor dinámico a CLP y buscador de códigos de giro aduanero.</p>
+    </div>
+    <div class="hero-actions no-print">
+      <div class="chip" id="fechaHoy">—</div>
+      <button class="btn light" id="btnUF">⟳ Actualizar UF</button>
+      <button class="btn light" id="btnPrint">🖨 Imprimir ficha</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="card">
+    <div class="card-head">
+      <h2>Indicadores del día</h2>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <button type="button" id="btnVolverAuto" class="btn ghost" style="display:none;padding:6px 12px;font-size:11.5px;">🔓 Volver a automático</button>
+        <span class="pill" id="ufStatus">Cargando…</span>
+      </div>
+    </div>
+
+    <div class="ind-grid">
+      <div class="ind" id="cardDolarAduana">
+        <div class="ind-head">
+          <label for="inpUsdAduana">Dólar Aduanero (CLP)</label>
+          <span class="pill blue" id="mesAduaneroBadge">Mes: Nov 2026</span>
+        </div>
+        <input id="inpUsdAduana" type="text" inputmode="decimal" value="969.70" autocomplete="off" spellcheck="false">
+        <div class="meta">Referencia Aduana · <b>editable</b><span id="sugDolar"></span></div>
+        <div class="meta-mes" id="mesAduaneroInfo">
+          <span>🏛️ Mes Aduanero: <b id="mesAduaneroTexto">Noviembre 2026</b> <span class="vigencia" id="mesAduaneroVigencia">· Periodo vigente DNA</span></span>
+        </div>
+      </div>
+
+      <div class="ind">
+        <div class="ind-head">
+          <label for="inpUsdAcuerdo">Dólar Acuerdo (CLP)</label>
+        </div>
+        <input id="inpUsdAcuerdo" type="text" inputmode="decimal" value="948.50" autocomplete="off" spellcheck="false">
+        <div class="meta">Acuerdo comercial · <b>editable</b></div>
+      </div>
+
+      <div class="ind">
+        <div class="ind-head">
+          <label for="inpUF">Unidad de Fomento (UF)</label>
+        </div>
+        <input id="inpUF" type="text" inputmode="decimal" value="0.00" autocomplete="off" spellcheck="false">
+        <div class="meta" id="ufMeta">Cargando…</div>
+      </div>
+
+      <div class="ind">
+        <div class="ind-head">
+          <label for="inpFecha">📅 Fecha de consulta UF</label>
+        </div>
+        <div class="fecha-row">
+          <input id="inpFecha" type="date" aria-label="Seleccionar fecha para consultar UF">
+          <button type="button" class="btn-fecha" id="btnAbrirCalendario" title="Abrir calendario">📅</button>
+          <button type="button" class="btn-fecha" id="btnFechaHoy" title="Volver a hoy">Hoy</button>
+        </div>
+        <div class="meta" id="fechaMeta">Selecciona una fecha → se consulta mindicador.cl</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid-3">
+    <article class="calc">
+      <div class="calc-head">
+        <h3>💵 Dólar Aduanero</h3>
+        <button type="button" class="btn-inv" id="btnInvA" title="Invertir dirección: CLP ⇄ USD">⇄ Invertir (CLP ➔ USD)</button>
+      </div>
+      <div class="field">
+        <label for="aMonto" id="aMontoLabel">Monto en USD (Aduana)</label>
+        <input id="aMonto" type="number" step="0.01" inputmode="decimal" value="68" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Tasa aduanera aplicada (CLP)</label>
+        <div class="ro" id="aTasa">$ 969,70</div>
+      </div>
+      <div class="total"><span id="aTotalLabel">TOTAL EN PESOS (CLP)</span><strong id="aTotal">$ 0</strong></div>
+      <div class="sub"><span id="aSubLabel">Equivalente en UF</span><b id="aUF">0,00 UF</b></div>
+    </article>
+
+    <article class="calc c">
+      <div class="calc-head">
+        <h3>📈 Unidad de Fomento (UF)</h3>
+        <button type="button" class="btn-inv" id="btnInvC" title="Invertir dirección: CLP ⇄ UF">⇄ Invertir (CLP ➔ UF)</button>
+      </div>
+      <div class="field">
+        <label for="cMonto" id="cMontoLabel">Monto en UF</label>
+        <input id="cMonto" type="number" step="0.0001" inputmode="decimal" value="1.5" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Valor UF oficial (CLP)</label>
+        <div class="ro" id="cTasa">$ 0,00</div>
+      </div>
+      <div class="total"><span id="cTotalLabel">TOTAL EN PESOS (CLP)</span><strong id="cTotal">$ 0</strong></div>
+      <div class="sub"><span id="cSubLabel">Equivalente en USD Aduana</span><b id="cUSD">US$ 0,00</b></div>
+    </article>
+
+    <article class="calc b">
+      <div class="calc-head">
+        <h3>🤝 Dólar Acuerdo</h3>
+        <button type="button" class="btn-inv" id="btnInvB" title="Invertir dirección: CLP ⇄ USD">⇄ Invertir (CLP ➔ USD)</button>
+      </div>
+      <div class="field">
+        <label for="bMonto" id="bMontoLabel">Monto en USD (Acuerdo)</label>
+        <input id="bMonto" type="number" step="0.01" inputmode="decimal" value="100" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Tasa acuerdo aplicada (CLP)</label>
+        <div class="ro" id="bTasa">$ 948,50</div>
+      </div>
+      <div class="total"><span id="bTotalLabel">TOTAL EN PESOS (CLP)</span><strong id="bTotal">$ 0</strong></div>
+      <div class="sub"><span id="bSubLabel">Equivalente en UF</span><b id="bUF">0,00 UF</b></div>
+    </article>
+  </section>
+
+  <section class="card cif-card">
+    <div class="card-head">
+      <div>
+        <h2>🧮 Calculadora CIF · Porcentaje · Tipo de cambio aduanero</h2>
+        <div class="meta" id="cifSubtitulo" style="margin-top:4px">Cálculo directo: Valor CIF (USD) ➔ Total a pagar (CLP)</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div class="seg-control" role="group" aria-label="Modo de cálculo CIF">
+          <button type="button" class="seg-btn active" id="btnCifDirecto">● Directo (CIF ➔ CLP)</button>
+          <button type="button" class="seg-btn" id="btnCifInverso">⇄ Inverso (Presupuesto CLP ➔ CIF)</button>
+        </div>
+        <span class="pill purple">Nueva</span>
+      </div>
+    </div>
+
+    <div class="cif-inputs">
+      <div class="field">
+        <label for="cifValor" id="cifValorLabel">Valor CIF (USD)</label>
+        <input id="cifValor" type="text" inputmode="decimal" value="535.25" autocomplete="off" spellcheck="false">
+        <div class="meta" id="cifValorMeta">Monto base en dólares</div>
+      </div>
+      <div class="field">
+        <label for="cifPct" id="cifPctLabel">Porcentaje a calcular (%)</label>
+        <input id="cifPct" type="text" inputmode="decimal" value="0.11" autocomplete="off" spellcheck="false">
+        <div class="meta" id="cifPctMeta">Ej: 0,11 = 0,11 % · 6 = 6 % Ad-valorem</div>
+      </div>
+      <div class="field">
+        <label for="cifTasa">Tipo de cambio aduanero (CLP)</label>
+        <input id="cifTasa" type="text" inputmode="decimal" value="969.70" autocomplete="off" spellcheck="false">
+        <div class="meta">Se sincroniza con el <b>Dólar Aduanero</b></div>
+      </div>
+    </div>
+
+    <div class="cif-flow">
+      <div class="cif-node">
+        <span id="cifN1Label">Valor CIF</span>
+        <b id="cifV1">US$ 535,25</b>
+      </div>
+      <div class="cif-op" id="cifOp1">×</div>
+      <div class="cif-node">
+        <span id="cifN2Label">Porcentaje</span>
+        <b id="cifV2">0,11 %</b>
+      </div>
+      <div class="cif-op" id="cifOp2">=</div>
+      <div class="cif-node">
+        <span id="cifN3Label">Subtotal USD</span>
+        <b id="cifV3">US$ 0,588775</b>
+      </div>
+      <div class="cif-op" id="cifOp3">×</div>
+      <div class="cif-node">
+        <span id="cifN4Label">Tipo de cambio</span>
+        <b id="cifV4">$ 969,70</b>
+      </div>
+      <div class="cif-op" id="cifOp4">=</div>
+      <div class="cif-final">
+        <span id="cifFinalLabel">TOTAL A PAGAR (CLP)</span>
+        <strong id="cifTotal">$ 570,94</strong>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="codigos">
+    <div class="card-head">
+      <h2>🔎 Consulta y búsqueda de códigos de giro aduanero</h2>
+      <span class="pill">Anexo 51-32</span>
+    </div>
+
+    <div class="code-grid">
+      <div>
+        <div class="search-row no-print">
+          <input id="codeSearch" type="search" placeholder="Buscar por código o descripción… (ej: 223, ad valorem, IVA)" autocomplete="off">
+          <button class="btn ghost" id="btnClear">Limpiar</button>
+        </div>
+        <div class="code-list" id="codeList"></div>
+      </div>
+
+      <div class="code-detail" id="codeDetail">
+        <div class="empty">Seleccione un código de la lista para ver su descripción reglamentaria y respaldo legal.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p><strong>Normativa de origen:</strong> Compendio de Normas Aduaneras — Anexo 51-32 (Giros comprobantes de pago).<br>
+    La UF se obtiene en línea vía <b>mindicador.cl</b> (con respaldo automático en <b>findic.cl</b>), pero puedes escribir tu propio valor manualmente. En ese caso, el sistema lo respeta y no lo sobrescribe hasta que tú pulses "🔓 Volver a automático" o "⟳ Actualizar UF".</p>
+  </footer>
+</main>
+
+<script>
+/* =========================================================
+   CONFIGURACIÓN
+   ========================================================= */
+const API_BASE = 'https://panel-aduana.onrender.com';
+const CONFIG = {
+  timeoutFetch: 4000,
+  maxRetrocesoDias: 3,
+  refreshFocusMin: 5,
+  dolarCacheMin: 10,
+  reintentos: 0
+};
+
+/* =========================================================
+   CÓDIGOS
+   ========================================================= */
+const CODIGOS = [
+  { c:'113.0', d:'Almacenaje y movilización aduanera.', f:'Dto. 450/78 Min. Hda. Dto. 91/78 Min. Trans. y Telec.' },
+  { c:'114.0', d:'Tasa importación mercancías en Almacén Particular Exp.', f:'Art. 108º Ordenanza de Aduanas' },
+  { c:'178.0', d:'Impuesto a las ventas y servicios.', f:'D.L. 825, Art. 14' },
+  { c:'179.0', d:'Impuestos Adicionales', f:'Arts. 37, 40 y 42 D.L. 825/74' },
+  { c:'180.0', d:'Valor Agregado a las importaciones. Pago Letra de Cambio o Pagaré.', f:'Art. 64º, D.L. 825/74' },
+  { c:'181.0', d:'I.V.A. Diferido', f:'Art. 64º, D.L. 825/74' },
+  { c:'182.0', d:'Derogado', f:'—' },
+  { c:'195.0', d:'Impuesto a los tabacos, cigarros, cigarrillos.', f:'Arts. 3, 4 y 5 D.L. 828/74' },
+  { c:'197.0', d:'Derechos ad valorem de combustibles.', f:'Ley 18.525' },
+  { c:'199.0', d:'Cuota de contado en importación pago diferido de derechos.', f:'Ley 18.634' },
+  { c:'201.0', d:'Impuesto a las gasolinas automotrices.', f:'Art. 6º Ley 18.502 (D.O. 03.04.86) (4) Ley 20.493/2011' },
+  { c:'209.0', d:'Derogado', f:'—' },
+  { c:'211.0', d:'Impuesto al petróleo diesel.', f:'Art. 6º Ley 18.502 (D.O. 03.04.86) (4) Ley 20.493/2011' },
+  { c:'212.0', d:'Gas licuado', f:'Art. 6º Ley 19.030 (D.O. 15.01.91) (1)' },
+  { c:'218.0', d:'Derogado', f:'—' },
+  { c:'219.0', d:'Tasa Verificación Aforo', f:'Art. 85 Ord. de Aduanas' },
+  { c:'115.0', d:'Impuesto sobre Valor de la Mano de obra incorporada.', f:'Art. 10 letra c) D.L. 299/74' },
+  { c:'116.0', d:'Recargo Mercancías usadas.', f:'Reg. Gral. Complem. Nº 3, ARANCEL ADUANERO' },
+  { c:'174.0', d:'Retención de anticipo de IVA', f:'D.L. N° 825/74' },
+  { c:'222.0', d:'Derechos específicos.', f:'Ley N° 18.525' },
+  { c:'223.0', d:'Derechos Ad valorem.', f:'Ley N° 18.525' },
+  { c:'224.0', d:'Sobretasa arancelaria y derechos compensatorios.', f:'Ley N° 18.525' },
+  { c:'225.0', d:'Recargo Mercancías en presunción de abandono.', f:'Art. 154 Ord. Aduanas' },
+  { c:'227.0', d:'Derechos Ad valorem en Zonas Francas.', f:'Art. 11 Ley Nº 18.211' },
+  { c:'229.0', d:'Tasa Admisión Temporal.', f:'Art. 107 Ord. de Aduanas' },
+  { c:'235.0', d:'Impto. Gasolina Automotriz Componente Variable', f:'Ley N° 20.493 (D.O. 14.02.2011)' },
+  { c:'236.0', d:'Impto. Petróleo Diesel Componente Variable', f:'Ley N° 20.493 (D.O. 14.02.2011)' },
+  { c:'237.0', d:'Impto. Gas Natural Comprimido Componente Base', f:'Ley N° 20.493 (D.O. 14.02.2011)' },
+  { c:'238.0', d:'Impto. Gas Natural Comprimido Componente Variable', f:'Ley N° 20.493 (D.O. 14.02.2011)' },
+  { c:'239.0', d:'Impto. Gas Licuado Petróleo Componente Variable', f:'Ley N° 20.493 (D.O. 14.02.2011)' },
+  { c:'261.0', d:'Reintegro por bonificación DFL 15/81', f:'D.F.L. Hda. Nº 15 / 1981' },
+  { c:'262.0', d:'Infracciones sancionadas por el Administrador', f:'Art. 173, 174, 175 y 176 Ordenanza de Aduanas' },
+  { c:'263.0', d:'Intereses Operaciones con Pago Diferido.', f:'Ley 18.634' },
+  { c:'264.0', d:'Infracciones reglamentarias Despachador', f:'Art. 173, 174, 175 y 176 Ordenanza de Aduanas' },
+  { c:'265.0', d:'Devolución Reintegro', f:'Ley 18.480' },
+  { c:'266.0', d:'Rentas Generales de la Nación', f:'Art. 165 a 167 Ordenanza de Aduanas' },
+  { c:'270.0', d:'Interés bancario Almacén Particular', f:'Artículo 109 Ord. Aduanas' },
+  { c:'295.0', d:'Impto. Específico cigarrillos', f:'Art. 4 D.L. 828/74 Ley N° 20.455' },
+  { c:'300.0', d:'Aporte Portuario', f:'Art. 4 Ley 20.773/14' },
+  { c:'699.0', d:'Total Diferido', f:'Ley 18.634' }
+];
+
+/* =========================================================
+   UTILIDADES
+   ========================================================= */
+const $ = (id) => document.getElementById(id);
+
+const nfCLP  = new Intl.NumberFormat('es-CL', { style:'currency', currency:'CLP', maximumFractionDigits:0 });
+const nfCLP2 = new Intl.NumberFormat('es-CL', { style:'currency', currency:'CLP', minimumFractionDigits:2, maximumFractionDigits:2 });
+const nf2 = new Intl.NumberFormat('es-CL', { minimumFractionDigits:2, maximumFractionDigits:2 });
+const nf4 = new Intl.NumberFormat('es-CL', { minimumFractionDigits:2, maximumFractionDigits:4 });
+const nfPct = new Intl.NumberFormat('es-CL', { maximumFractionDigits:4 });
+const nf6 = new Intl.NumberFormat('es-CL', { maximumFractionDigits:6 });
+
+const money  = (v) => nfCLP.format(Math.round(Number(v) || 0));
+const money2 = (v) => nfCLP2.format(Number(v) || 0);
+
+function toNumber(v){
+  if (typeof v === 'number') return isFinite(v) ? v : 0;
+  let s = String(v ?? '').trim().replace(/[^\d.,-]/g, '');
+  if (!s) return 0;
+  if (s.includes(',') && s.includes('.')) s = s.replace(/\./g, '').replace(',', '.');
+  else if (s.includes(',')) s = s.replace(',', '.');
+  const n = parseFloat(s);
+  return isFinite(n) ? n : 0;
+}
+
+function fmtDecimalInput(el, decimals){
+  const raw = String(el.value ?? '').trim();
+  if (!raw) return;
+  const n = toNumber(raw);
+  el.value = n.toFixed(decimals);
+}
+
+function formatDateISO(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${dd}`;
+}
+function formatDateCL(iso){
+  if(!iso) return '—';
+  const parts = iso.split('-');
+  if(parts.length !== 3) return iso;
+  const [y,m,d] = parts;
+  return `${d}/${m}/${y}`;
+}
+function toMindicadorDate(iso){
+  const [y,m,d] = iso.split('-');
+  return `${d}-${m}-${y}`;
+}
+
+/* =========================================================
+   FETCH CON TIMEOUT Y CANCELACIÓN
+   ========================================================= */
+async function fetchConTimeout(url, timeoutMs, signalExterno){
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort('timeout'), timeoutMs);
+  if (signalExterno){
+    if (signalExterno.aborted) controller.abort('externo');
+    else signalExterno.addEventListener('abort', () => controller.abort('externo'), { once:true });
+  }
+  try {
+    return await fetch(url, { cache:'no-store', signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/* =========================================================
+   CONSULTA UF A mindicador.cl (CON RESPALDO EN findic.cl)
+   ========================================================= */
+async function fetchUFPorFecha(fechaISO, signalExterno){
+  if(!fechaISO) return null;
+  const fechaParam = toMindicadorDate(fechaISO);
+  const fuentes = [
+    { nombre: 'mindicador.cl', url: 'https://mindicador.cl/api/uf/' + fechaParam },
+    { nombre: 'findic.cl', url: 'https://findic.cl/api/uf/' + fechaParam }
+  ];
+
+  for (const f of fuentes){
+    for (let intento = 0; intento <= CONFIG.reintentos; intento++){
+      if (signalExterno && signalExterno.aborted) return null;
+      try {
+        const r = await fetchConTimeout(f.url, CONFIG.timeoutFetch, signalExterno);
+        if(!r.ok) throw new Error('HTTP ' + r.status);
+        const j = await r.json();
+        const s = j && j.serie && j.serie[0];
+        if(!s || !s.valor) throw new Error('sin dato');
+        return {
+          valor: toNumber(s.valor),
+          fecha: String(s.fecha || '').slice(0,10),
+          fuente: f.nombre
+        };
+      } catch(e){
+        const esTimeout = (e.name === 'AbortError' || e === 'externo');
+        const esUltimo = (intento === CONFIG.reintentos);
+        if (esTimeout){
+          console.log(`[UF] [${f.nombre}] Timeout/cancelado:`, fechaISO);
+          if (esUltimo) break;
+          continue;
+        }
+        console.warn(`[UF] [${f.nombre}] Falló`, fechaISO, '→', e.message);
+        if (esUltimo) break;
+        await new Promise(res => setTimeout(res, 500));
+      }
+    }
+  }
+  return null;
+}
+
+async function consultarUFParaFecha(fechaISO, signalExterno){
+  if (!fechaISO) return null;
+  try {
+    const url = `${API_BASE}/indicadores/uf?fecha=${encodeURIComponent(fechaISO)}`;
+    const r = await fetchConTimeout(url, CONFIG.timeoutFetch, signalExterno);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json();
+    return {
+      valor: toNumber(j.valor),
+      fecha: j.fecha_dato || fechaISO,
+      fuente: (j.fuente || 'API') + ' (vía tu API)'
+    };
+  } catch (e) {
+    console.warn('[UF] Error consultando tu API:', e.message);
+    return null;
+  }
+}
+
+let dolarCache = { valor: null, ts: 0 };
+
+async function obtenerDolarObservado(){
+  const ahora = Date.now();
+  if (dolarCache.valor && (ahora - dolarCache.ts) < CONFIG.dolarCacheMin * 60 * 1000){
+    return dolarCache.valor;
+  }
+  try {
+    const r = await fetchConTimeout(`${API_BASE}/indicadores/dolar-observado`, CONFIG.timeoutFetch);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json();
+    if (j && j.valor){
+      dolarCache = { valor: Number(j.valor), ts: ahora };
+      return Number(j.valor);
+    }
+  } catch (e) {
+    console.warn('[Dólar] Error consultando tu API:', e.message);
+  }
+  return null;
+}
+
+/* =========================================================
+   MODO MANUAL DE UF
+   =========================================================
+   - modoManualUF = false → la UF la controla mindicador.cl
+   - modoManualUF = true  → el valor escrito por el usuario manda,
+                             NADA lo sobrescribe.
+   Se persiste en localStorage.
+   ========================================================= */
+const LS_UF_MANUAL   = 'panel-control-uf-manual';   // { manual:bool, valor:number, fecha:iso }
+const LS_UF_ULTIMO   = 'panel-control-uf-last';     // { valor, fecha }  (último obtenido de mindicador.cl)
+
+let modoManualUF = false;
+let ultimoUFValido = { valor: null, fecha: null };   // último valor de mindicador.cl (para fallback)
+
+function guardarModoManual(){
+  try {
+    const valor = toNumber($('inpUF').value);
+    localStorage.setItem(LS_UF_MANUAL, JSON.stringify({
+      manual: modoManualUF,
+      valor: modoManualUF ? valor : null,
+      fecha: modoManualUF ? formatDateISO(new Date()) : null
+    }));
+  } catch(e){}
+}
+
+function cargarModoManual(){
+  try {
+    const raw = localStorage.getItem(LS_UF_MANUAL);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    if (d && d.manual && typeof d.valor === 'number' && d.valor > 0){
+      modoManualUF = true;
+      $('inpUF').value = d.valor.toFixed(2);
+      $('inpUF').classList.add('manual');
+      $('ufStatus').textContent = '✏️ Manual';
+      $('ufStatus').className = 'pill purple';
+      $('ufMeta').innerHTML = 'Valor ingresado manualmente el <b>' + formatDateCL(d.fecha) + '</b>. No se actualiza automáticamente.';
+      $('btnVolverAuto').style.display = '';
+    }
+  } catch(e){}
+}
+
+function activarModoManual(){
+  if (modoManualUF) return;
+  modoManualUF = true;
+  $('inpUF').classList.add('manual');
+  $('ufStatus').textContent = '✏️ Manual';
+  $('ufStatus').className = 'pill purple';
+  $('ufMeta').innerHTML = 'Valor ingresado manualmente. No se actualiza automáticamente hasta pulsar "🔓 Volver a automático" o "⟳ Actualizar UF".';
+  $('btnVolverAuto').style.display = '';
+  guardarModoManual();
+  console.log('[UF] Modo MANUAL activado');
+}
+
+function desactivarModoManual(){
+  if (!modoManualUF) return;
+  modoManualUF = false;
+  $('inpUF').classList.remove('manual');
+  $('btnVolverAuto').style.display = 'none';
+  guardarModoManual();
+  console.log('[UF] Modo MANUAL desactivado');
+}
+
+function guardarUltimaUF(valor, fecha){
+  ultimoUFValido = { valor: Number(valor), fecha: fecha };
+  try { localStorage.setItem(LS_UF_ULTIMO, JSON.stringify(ultimoUFValido)); } catch(e){}
+}
+
+function cargarUltimaUF(){
+  try {
+    const raw = localStorage.getItem(LS_UF_ULTIMO);
+    if (!raw) return null;
+    const d = JSON.parse(raw);
+    if (d && d.valor > 0){
+      ultimoUFValido = { valor: Number(d.valor), fecha: d.fecha };
+      return d;
+    }
+  } catch(e){}
+  return null;
+}
+
+/* =========================================================
+   APLICAR RESULTADO UF A LA UI
+   ========================================================= */
+function aplicarResultadoUF(resultado, fechaPedida){
+  /* Si estamos en modo manual, NUNCA tocar el valor */
+  if (modoManualUF){
+    console.log('[UF] Modo manual activo → se ignora resultado automático');
+    return;
+  }
+
+  /* Caso A: consulta falló → conservar último valor válido */
+  if (!resultado || !(resultado.valor > 0)){
+    if (ultimoUFValido.valor){
+      $('ufStatus').textContent = 'Sin actualización · último valor';
+      $('ufStatus').className = 'pill warn';
+      $('ufMeta').innerHTML = 'No se pudo consultar para <b>' + formatDateCL(fechaPedida)
+        + '</b>. Se mantiene el último valor válido ('
+        + formatDateCL(ultimoUFValido.fecha) + ').';
+      return;
+    }
+    $('inpUF').value = '0.00';
+    $('ufStatus').textContent = 'Sin dato';
+    $('ufStatus').className = 'pill warn';
+    $('ufMeta').innerHTML = 'No hay valor UF disponible para <b>' + formatDateCL(fechaPedida) + '</b>.';
+    recalc();
+    return;
+  }
+
+  /* Caso B: éxito */
+  $('inpUF').value = resultado.valor.toFixed(2);
+  const fuenteNom = resultado.fuente || 'mindicador.cl';
+  $('ufStatus').textContent = 'UF en línea · ' + fuenteNom;
+  $('ufStatus').className = 'pill ok';
+
+  const fechaMostrada = resultado.fecha || fechaPedida;
+  $('ufMeta').innerHTML = 'Fuente: <b>' + fuenteNom + '</b> · ' + formatDateCL(fechaMostrada);
+
+  guardarUltimaUF(resultado.valor, fechaMostrada);
+  recalc();
+}
+
+/* =========================================================
+   ESTADO GLOBAL DE CONSULTA
+   ========================================================= */
+let consultaActual = { id: 0, abort: null };
+
+function cancelarConsultaActual(){
+  if (consultaActual.abort){
+    try { consultaActual.abort.abort('nueva consulta'); } catch(e){}
+  }
+}
+
+/* =========================================================
+   FLUJO PRINCIPAL
+   ========================================================= */
+async function consultarYAplicarUF(fechaISO, mostrarSpinner, esRefrescoSilencioso){
+  /* Si estás en modo manual y NO es una acción explícita del usuario,
+     no consultamos nada */
+  if (modoManualUF && esRefrescoSilencioso){
+    console.log('[UF] Modo manual → se omite refresco silencioso');
+    return;
+  }
+
+  cancelarConsultaActual();
+  const miId = consultaActual.id + 1;
+  const controller = new AbortController();
+  consultaActual = { id: miId, abort: controller };
+
+  if (mostrarSpinner && !modoManualUF){
+    $('ufStatus').textContent = 'Consultando…';
+    $('ufStatus').className = 'pill load';
+    $('fechaMeta').textContent = '⏳ Consultando mindicador.cl para ' + formatDateCL(fechaISO) + '…';
+  }
+
+  try {
+    const resultado = await consultarUFParaFecha(fechaISO, controller.signal);
+
+    if (miId !== consultaActual.id){
+      console.log('[UF] Respuesta descartada (hay una más nueva en curso)');
+      return;
+    }
+
+    if (esRefrescoSilencioso && (!resultado || !(resultado.valor > 0))){
+      console.log('[UF] Refresco silencioso falló → se mantiene el valor actual');
+      return;
+    }
+
+    aplicarResultadoUF(resultado, fechaISO);
+
+    if (resultado){
+      const fechaDevuelta = resultado.fecha || fechaISO;
+      if (fechaDevuelta !== fechaISO){
+        $('fechaMeta').innerHTML = '📅 Consulta para ' + formatDateCL(fechaISO)
+          + ' <span style="color:#b45309">(dato disponible: ' + formatDateCL(fechaDevuelta) + ')</span>';
+      } else {
+        $('fechaMeta').textContent = '📅 Consulta para ' + formatDateCL(fechaISO);
+      }
+    } else if (!esRefrescoSilencioso && !modoManualUF){
+      $('fechaMeta').innerHTML = '📅 Consulta para ' + formatDateCL(fechaISO)
+        + ' <span style="color:#b45309">(sin dato online)</span>';
+    }
+
+    const dolar = await obtenerDolarObservado();
+    if (dolar){
+      $('sugDolar').innerHTML = ' · observado <b>' + money2(dolar) + '</b> <button class="link" id="btnUseDolar">usar</button>';
+      $('btnUseDolar').onclick = () => {
+        $('inpUsdAduana').value = Number(dolar).toFixed(2);
+        $('cifTasa').value = Number(dolar).toFixed(2);
+        save(); recalc(); recalcCIF();
+      };
+    }
+
+    save();
+
+  } catch(err){
+    if (miId !== consultaActual.id) return;
+    console.error('[UF] Error:', err);
+    if (!esRefrescoSilencioso && !modoManualUF){
+      if (ultimoUFValido.valor){
+        $('ufStatus').textContent = 'Sin actualización · último valor';
+        $('ufStatus').className = 'pill warn';
+        $('ufMeta').innerHTML = 'Error al consultar. Se mantiene el último valor válido ('
+          + formatDateCL(ultimoUFValido.fecha) + ').';
+      } else {
+        $('ufStatus').textContent = 'Error';
+        $('ufStatus').className = 'pill warn';
+        $('fechaMeta').textContent = '⚠️ Error al consultar la UF.';
+      }
+    }
+  }
+}
+
+/* =========================================================
+   MES ADUANERO (SERVICIO NACIONAL DE ADUANAS)
+   ========================================================= */
+const MESES = [
+  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+];
+const MESES_ABR = [
+  'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+  'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'
+];
+
+function actualizarMesAduanero(fechaISO){
+  let d;
+  if (fechaISO && /^\d{4}-\d{2}-\d{2}$/.test(fechaISO)){
+    const [y, m, day] = fechaISO.split('-').map(Number);
+    d = new Date(y, m - 1, day);
+  } else {
+    d = new Date();
+  }
+  const mesIndex = d.getMonth();
+  const year = d.getFullYear();
+  const mesNombre = MESES[mesIndex];
+  const mesAbr = MESES_ABR[mesIndex];
+
+  const hoy = new Date();
+  const esMesActual = (hoy.getFullYear() === year && hoy.getMonth() === mesIndex);
+
+  if ($('mesAduaneroBadge')){
+    $('mesAduaneroBadge').textContent = `Mes: ${mesAbr} ${year}`;
+  }
+  if ($('mesAduaneroTexto')){
+    $('mesAduaneroTexto').textContent = `${mesNombre} ${year}`;
+  }
+  if ($('mesAduaneroVigencia')){
+    $('mesAduaneroVigencia').textContent = esMesActual
+      ? '· Periodo aduanero vigente'
+      : (d < hoy ? '· Periodo aduanero histórico' : '· Periodo aduanero proyectado');
+  }
+}
+
+/* =========================================================
+   MODOS DE CÁLCULO INVERSO (BIDIRECCIONAL)
+   ========================================================= */
+let modoInversoA = false;
+let modoInversoB = false;
+let modoInversoC = false;
+let modoCifInverso = false;
+
+function setModoInversoA(inverso){
+  if (modoInversoA === inverso) return;
+  const usdA = toNumber($('inpUsdAduana').value);
+  const m = toNumber($('aMonto').value);
+
+  modoInversoA = inverso;
+  const btn = $('btnInvA');
+  const lblM = $('aMontoLabel');
+  const lblTot = $('aTotalLabel');
+  const inp = $('aMonto');
+
+  if (modoInversoA){
+    btn.classList.add('active');
+    btn.innerHTML = '⇄ Invertido: <b>CLP ➔ USD</b>';
+    lblM.textContent = 'Presupuesto en CLP';
+    lblTot.textContent = 'EQUIVALENTE EN USD ADUANA';
+    inp.step = '1';
+    if (m > 0 && usdA > 0) inp.value = Math.round(m * usdA);
+  } else {
+    btn.classList.remove('active');
+    btn.innerHTML = '⇄ Invertir (CLP ➔ USD)';
+    lblM.textContent = 'Monto en USD (Aduana)';
+    lblTot.textContent = 'TOTAL EN PESOS (CLP)';
+    inp.step = '0.01';
+    if (m > 0 && usdA > 0) inp.value = (m / usdA).toFixed(2);
+  }
+  save();
+  recalc();
+}
+
+function setModoInversoC(inverso){
+  if (modoInversoC === inverso) return;
+  const uf = toNumber($('inpUF').value);
+  const m = toNumber($('cMonto').value);
+
+  modoInversoC = inverso;
+  const btn = $('btnInvC');
+  const lblM = $('cMontoLabel');
+  const lblTot = $('cTotalLabel');
+  const inp = $('cMonto');
+
+  if (modoInversoC){
+    btn.classList.add('active');
+    btn.innerHTML = '⇄ Invertido: <b>CLP ➔ UF</b>';
+    lblM.textContent = 'Presupuesto en CLP';
+    lblTot.textContent = 'EQUIVALENTE EN UF';
+    inp.step = '1';
+    if (m > 0 && uf > 0) inp.value = Math.round(m * uf);
+  } else {
+    btn.classList.remove('active');
+    btn.innerHTML = '⇄ Invertir (CLP ➔ UF)';
+    lblM.textContent = 'Monto en UF';
+    lblTot.textContent = 'TOTAL EN PESOS (CLP)';
+    inp.step = '0.0001';
+    if (m > 0 && uf > 0) inp.value = (m / uf).toFixed(4);
+  }
+  save();
+  recalc();
+}
+
+function setModoInversoB(inverso){
+  if (modoInversoB === inverso) return;
+  const usdB = toNumber($('inpUsdAcuerdo').value);
+  const m = toNumber($('bMonto').value);
+
+  modoInversoB = inverso;
+  const btn = $('btnInvB');
+  const lblM = $('bMontoLabel');
+  const lblTot = $('bTotalLabel');
+  const inp = $('bMonto');
+
+  if (modoInversoB){
+    btn.classList.add('active');
+    btn.innerHTML = '⇄ Invertido: <b>CLP ➔ USD</b>';
+    lblM.textContent = 'Presupuesto en CLP';
+    lblTot.textContent = 'EQUIVALENTE EN USD ACUERDO';
+    inp.step = '1';
+    if (m > 0 && usdB > 0) inp.value = Math.round(m * usdB);
+  } else {
+    btn.classList.remove('active');
+    btn.innerHTML = '⇄ Invertir (CLP ➔ USD)';
+    lblM.textContent = 'Monto en USD (Acuerdo)';
+    lblTot.textContent = 'TOTAL EN PESOS (CLP)';
+    inp.step = '0.01';
+    if (m > 0 && usdB > 0) inp.value = (m / usdB).toFixed(2);
+  }
+  save();
+  recalc();
+}
+
+function setModoCifInverso(inverso){
+  if (modoCifInverso === inverso) return;
+
+  const val  = toNumber($('cifValor').value);
+  const pct  = toNumber($('cifPct').value);
+  const tasa = toNumber($('cifTasa').value);
+
+  modoCifInverso = inverso;
+
+  const btnDir = $('btnCifDirecto');
+  const btnInv = $('btnCifInverso');
+  const subTit = $('cifSubtitulo');
+  const valLbl = $('cifValorLabel');
+  const valMeta = $('cifValorMeta');
+  const inpVal = $('cifValor');
+
+  const n1Lbl = $('cifN1Label');
+  const op1   = $('cifOp1');
+  const n2Lbl = $('cifN2Label');
+  const op2   = $('cifOp2');
+  const n3Lbl = $('cifN3Label');
+  const op3   = $('cifOp3');
+  const n4Lbl = $('cifN4Label');
+  const op4   = $('cifOp4');
+  const finLbl= $('cifFinalLabel');
+
+  if (modoCifInverso){
+    btnDir.classList.remove('active');
+    btnInv.classList.add('active');
+    subTit.textContent = 'Cálculo inverso: Presupuesto total (CLP) ➔ Valor CIF máximo (USD)';
+    valLbl.textContent = 'Presupuesto total (CLP)';
+    valMeta.textContent = 'Monto disponible para pagar gravámenes';
+
+    if (val > 0 && tasa > 0 && pct > 0){
+      const totalCLP = (val * (pct / 100)) * tasa;
+      inpVal.value = totalCLP.toFixed(2);
+    }
+
+    n1Lbl.textContent = 'Presupuesto CLP';
+    op1.textContent   = '÷';
+    n2Lbl.textContent = 'Tipo de cambio';
+    op2.textContent   = '=';
+    n3Lbl.textContent = 'Subtotal USD';
+    op3.textContent   = '÷';
+    n4Lbl.textContent = 'Porcentaje';
+    op4.textContent   = '=';
+    finLbl.textContent= 'VALOR CIF MÁXIMO (USD)';
+  } else {
+    btnDir.classList.add('active');
+    btnInv.classList.remove('active');
+    subTit.textContent = 'Cálculo directo: Valor CIF (USD) ➔ Total a pagar (CLP)';
+    valLbl.textContent = 'Valor CIF (USD)';
+    valMeta.textContent = 'Monto base en dólares';
+
+    if (val > 0 && tasa > 0 && pct > 0){
+      const cifMaxUSD = (val / tasa) / (pct / 100);
+      inpVal.value = cifMaxUSD.toFixed(2);
+    }
+
+    n1Lbl.textContent = 'Valor CIF';
+    op1.textContent   = '×';
+    n2Lbl.textContent = 'Porcentaje';
+    op2.textContent   = '=';
+    n3Lbl.textContent = 'Subtotal USD';
+    op3.textContent   = '×';
+    n4Lbl.textContent = 'Tipo de cambio';
+    op4.textContent   = '=';
+    finLbl.textContent= 'TOTAL A PAGAR (CLP)';
+  }
+  recalcCIF();
+  save();
+}
+
+/* =========================================================
+   PERSISTENCIA GENERAL
+   ========================================================= */
+const LS_KEY = 'panel-control-v1';
+
+function save(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      usdAduana: $('inpUsdAduana').value,
+      usdAcuerdo: $('inpUsdAcuerdo').value,
+      fecha: $('inpFecha').value,
+      cifValor: $('cifValor').value,
+      cifPct: $('cifPct').value,
+      cifTasa: $('cifTasa').value,
+      modoCifInverso: modoCifInverso,
+      modoInversoA: modoInversoA,
+      modoInversoB: modoInversoB,
+      modoInversoC: modoInversoC
+    }));
+  }catch(e){}
+}
+
+function restore(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return false;
+    const d = JSON.parse(raw);
+    if(d.usdAduana) $('inpUsdAduana').value = d.usdAduana;
+    if(d.usdAcuerdo) $('inpUsdAcuerdo').value = d.usdAcuerdo;
+    if(d.fecha && /^\d{4}-\d{2}-\d{2}$/.test(d.fecha)) $('inpFecha').value = d.fecha;
+    if(d.cifValor != null && d.cifValor !== '') $('cifValor').value = d.cifValor;
+    if(d.cifPct != null && d.cifPct !== '') $('cifPct').value = d.cifPct;
+    if(d.cifTasa != null && d.cifTasa !== '') $('cifTasa').value = d.cifTasa;
+    if(d.modoInversoA) setModoInversoA(true);
+    if(d.modoInversoB) setModoInversoB(true);
+    if(d.modoInversoC) setModoInversoC(true);
+    if(d.modoCifInverso) setModoCifInverso(true);
+    return true;
+  }catch(e){ return false; }
+}
+
+/* =========================================================
+   RECÁLCULO (DIRECTO E INVERSO)
+   ========================================================= */
+function recalc(){
+  const usdA = toNumber($('inpUsdAduana').value);
+  const usdB = toNumber($('inpUsdAcuerdo').value);
+  const uf   = toNumber($('inpUF').value);
+
+  const aM = toNumber($('aMonto').value);
+  const bM = toNumber($('bMonto').value);
+  const cM = toNumber($('cMonto').value);
+
+  // Card A: Dólar Aduanero
+  $('aTasa').textContent = money2(usdA);
+  if (!modoInversoA){
+    const aTot = aM * usdA;
+    $('aTotal').textContent = money(aTot);
+    $('aUF').textContent    = (uf > 0 ? nf4.format(aTot / uf) : '0,00') + ' UF';
+    $('aSubLabel').textContent = 'Equivalente en UF';
+  } else {
+    const aUSD = usdA > 0 ? (aM / usdA) : 0;
+    $('aTotal').textContent = 'US$ ' + nf2.format(aUSD);
+    $('aUF').textContent    = (uf > 0 ? nf4.format(aM / uf) : '0,00') + ' UF';
+    $('aSubLabel').textContent = 'Equivalente en UF';
+  }
+
+  // Card B: Dólar Acuerdo
+  $('bTasa').textContent = money2(usdB);
+  if (!modoInversoB){
+    const bTot = bM * usdB;
+    $('bTotal').textContent = money(bTot);
+    $('bUF').textContent    = (uf > 0 ? nf4.format(bTot / uf) : '0,00') + ' UF';
+    $('bSubLabel').textContent = 'Equivalente en UF';
+  } else {
+    const bUSD = usdB > 0 ? (bM / usdB) : 0;
+    $('bTotal').textContent = 'US$ ' + nf2.format(bUSD);
+    $('bUF').textContent    = (uf > 0 ? nf4.format(bM / uf) : '0,00') + ' UF';
+    $('bSubLabel').textContent = 'Equivalente en UF';
+  }
+
+  // Card C: UF
+  $('cTasa').textContent = money2(uf);
+  if (!modoInversoC){
+    const cTot = cM * uf;
+    $('cTotal').textContent = money(cTot);
+    $('cUSD').textContent   = 'US$ ' + (usdA > 0 ? nf2.format(cTot / usdA) : '0,00');
+    $('cSubLabel').textContent = 'Equivalente en USD Aduana';
+  } else {
+    const cUF = uf > 0 ? (cM / uf) : 0;
+    $('cTotal').textContent = nf4.format(cUF) + ' UF';
+    $('cUSD').textContent   = 'US$ ' + (usdA > 0 ? nf2.format(cM / usdA) : '0,00');
+    $('cSubLabel').textContent = 'Equivalente en USD Aduana';
+  }
+}
+
+/* =========================================================
+   CIF (DIRECTO E INVERSO)
+   ========================================================= */
+function recalcCIF(){
+  const val  = toNumber($('cifValor').value);
+  const pct  = toNumber($('cifPct').value);
+  const tasa = toNumber($('cifTasa').value);
+
+  if (!modoCifInverso){
+    const subtotalUSD = val * (pct / 100);
+    const totalCLP = subtotalUSD * tasa;
+
+    $('cifV1').textContent = 'US$ ' + nf2.format(val);
+    $('cifV2').textContent = nfPct.format(pct) + ' %';
+    $('cifV3').textContent = 'US$ ' + nf6.format(subtotalUSD);
+    $('cifV4').textContent = money2(tasa);
+    $('cifTotal').textContent = money2(totalCLP);
+  } else {
+    const subtotalUSD = tasa > 0 ? (val / tasa) : 0;
+    const factorPct = (pct / 100);
+    const cifMaxUSD = factorPct > 0 ? (subtotalUSD / factorPct) : 0;
+
+    $('cifV1').textContent = money2(val);
+    $('cifV2').textContent = money2(tasa);
+    $('cifV3').textContent = 'US$ ' + nf6.format(subtotalUSD);
+    $('cifV4').textContent = nfPct.format(pct) + ' %';
+    $('cifTotal').textContent = 'US$ ' + nf2.format(cifMaxUSD);
+  }
+}
+
+/* =========================================================
+   CÓDIGOS
+   ========================================================= */
+let codigoActivo = null;
+
+function estadoDe(c){ return /derogado/i.test(c.d) ? 'Derogado' : 'Vigente'; }
+
+async function renderCodes(){
+  const q = $('codeSearch').value.trim();
+  const cont = $('codeList');
+
+  try {
+    const url = q
+      ? `${API_BASE}/codigos?q=${encodeURIComponent(q)}`
+      : `${API_BASE}/codigos`;
+    const r = await fetch(url);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+
+    // Adaptamos los nombres de campo de la API al formato del panel
+    const lista = data.map(item => ({
+      c: item.codigo,
+      d: item.descripcion,
+      f: item.fuente
+    }));
+
+    cont.innerHTML = '';
+    if (!lista.length){
+      cont.innerHTML = '<div class="empty">Sin resultados para «' + q + '».</div>';
+      return;
+    }
+
+    lista.forEach(x => {
+      const b = document.createElement('button');
+      b.className = 'code-item' + (codigoActivo && codigoActivo.c === x.c && codigoActivo.d === x.d ? ' active' : '');
+      b.innerHTML = '<span class="c">' + x.c + '</span>'
+                  + '<span><span class="d">' + x.d + '</span><span class="f">' + x.f + '</span></span>';
+      b.onclick = () => { codigoActivo = x; renderCodes(); showCode(x); };
+      cont.appendChild(b);
+    });
+  } catch (e) {
+    cont.innerHTML = '<div class="empty">⚠️ No se pudo conectar con la API local (¿está encendido uvicorn?).</div>';
+  }
+}
+
+function showCode(x){
+  const estado = estadoDe(x);
+  $('codeDetail').innerHTML = `
+    <div class="detail-top">
+      <span class="code-badge">${x.c}</span>
+      <span class="pill ${estado === 'Vigente' ? 'ok' : 'warn'}">${estado}</span>
+    </div>
+    <h3>${x.d}</h3>
+    <dl class="dl">
+      <div><dt>Código de cuenta</dt><dd>${x.c}</dd></div>
+      <div><dt>Descripción oficial</dt><dd>${x.d}</dd></div>
+      <div><dt>Fuente / Base legal</dt><dd>${x.f}</dd></div>
+      <div><dt>Normativa de origen</dt><dd>Compendio de Normas Aduaneras — Anexo 51-32 (Giros comprobantes de pago)</dd></div>
+    </dl>`;
+}
+
+/* =========================================================
+   EVENTOS E INICIALIZACIÓN
+   ========================================================= */
+function bindEvents(){
+  ['inpUsdAduana','inpUsdAcuerdo'].forEach(id => {
+    const el = $(id);
+    el.addEventListener('input', () => { save(); recalc(); });
+    el.addEventListener('blur',  () => {
+      fmtDecimalInput(el, 2);
+      save(); recalc();
+      if (id === 'inpUsdAduana'){
+        const v = toNumber($('inpUsdAduana').value);
+        if (v > 0) $('cifTasa').value = v.toFixed(2);
+        recalcCIF();
+      }
+    });
+    el.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter'){ ev.preventDefault(); el.blur(); }
+    });
+  });
+
+  /* ===== UF: input MANUAL ===== */
+  const elUF = $('inpUF');
+  elUF.addEventListener('input', () => {
+    // Cada vez que el usuario escribe, activamos modo manual
+    activarModoManual();
+    save();
+    recalc();
+  });
+  elUF.addEventListener('blur', () => {
+    if (modoManualUF){
+      fmtDecimalInput(elUF, 2);
+      guardarModoManual();
+      recalc();
+    } else {
+      fmtDecimalInput(elUF, 2);
+      recalc();
+    }
+  });
+  elUF.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Enter'){ ev.preventDefault(); elUF.blur(); }
+  });
+
+  ['aMonto','bMonto','cMonto'].forEach(id => {
+    $(id).addEventListener('input', recalc);
+  });
+
+  $('cifValor').addEventListener('input', () => { save(); recalcCIF(); });
+  $('cifValor').addEventListener('blur',  () => { fmtDecimalInput($('cifValor'), 2); save(); recalcCIF(); });
+  $('cifPct').addEventListener('input',   () => { save(); recalcCIF(); });
+  $('cifTasa').addEventListener('input',  () => { save(); recalcCIF(); });
+  $('cifTasa').addEventListener('blur',   () => { fmtDecimalInput($('cifTasa'), 2); save(); recalcCIF(); });
+
+  /* ===== BOTONES DE CÁLCULO INVERSO ===== */
+  $('btnInvA').addEventListener('click', () => setModoInversoA(!modoInversoA));
+  $('btnInvB').addEventListener('click', () => setModoInversoB(!modoInversoB));
+  $('btnInvC').addEventListener('click', () => setModoInversoC(!modoInversoC));
+
+  $('btnCifDirecto').addEventListener('click', () => setModoCifInverso(false));
+  $('btnCifInverso').addEventListener('click', () => setModoCifInverso(true));
+
+  /* ===== Botón "Volver a automático" ===== */
+  $('btnVolverAuto').addEventListener('click', async () => {
+    desactivarModoManual();
+    const f = $('inpFecha').value || formatDateISO(new Date());
+    await consultarYAplicarUF(f, true, false);
+  });
+
+  /* ===== FECHA ===== */
+  const fechaInput = $('inpFecha');
+  fechaInput.removeAttribute('readonly');
+  fechaInput.removeAttribute('disabled');
+  fechaInput.readOnly = false;
+  fechaInput.disabled = false;
+
+  let ultimaFechaAplicada = null;
+
+  async function aplicarFecha(origen){
+    const fechaISO = fechaInput.value;
+    console.log('[Fecha] Evento:', origen, '→ valor:', fechaISO);
+
+    if (!fechaISO){
+      $('fechaMeta').textContent = '⚠️ Selecciona una fecha válida';
+      return;
+    }
+    actualizarMesAduanero(fechaISO);
+    if (fechaISO === ultimaFechaAplicada){
+      console.log('[Fecha] Sin cambios, se omite consulta');
+      return;
+    }
+
+    save();
+
+    /* Si está en modo manual, NO toca la UF */
+    if (modoManualUF){
+      $('fechaMeta').innerHTML = '📅 Fecha: ' + formatDateCL(fechaISO)
+        + ' <span style="color:#7c3aed">(modo manual — la UF no se actualiza)</span>';
+      ultimaFechaAplicada = fechaISO;
+      return;
+    }
+
+    await consultarYAplicarUF(fechaISO, true, false);
+    ultimaFechaAplicada = fechaISO;
+  }
+
+  fechaInput.addEventListener('change', () => aplicarFecha('change'));
+  fechaInput.addEventListener('blur',   () => {
+    if (fechaInput.value && fechaInput.value !== ultimaFechaAplicada){
+      aplicarFecha('blur');
+    }
+  });
+  fechaInput.addEventListener('input', () => {
+    if (modoManualUF){
+      $('fechaMeta').innerHTML = '📅 Fecha: ' + formatDateCL(fechaInput.value)
+        + ' <span style="color:#7c3aed">(modo manual activo)</span>';
+    } else {
+      $('fechaMeta').textContent = '📅 Fecha seleccionada: ' + formatDateCL(fechaInput.value) + ' (confirma para consultar)';
+    }
+  });
+
+  $('btnAbrirCalendario').addEventListener('click', () => {
+    if (typeof fechaInput.showPicker === 'function'){
+      try { fechaInput.showPicker(); }
+      catch(e){ fechaInput.focus(); fechaInput.click(); }
+    } else {
+      fechaInput.focus();
+      fechaInput.click();
+    }
+  });
+
+  $('btnFechaHoy').addEventListener('click', async () => {
+    fechaInput.value = formatDateISO(new Date());
+    ultimaFechaAplicada = null;
+    await aplicarFecha('btnHoy');
+  });
+
+  $('codeSearch').addEventListener('input', renderCodes);
+  $('btnClear').addEventListener('click', () => {
+    $('codeSearch').value = '';
+    renderCodes();
+    $('codeSearch').focus();
+  });
+
+  /* ===== Botón "Actualizar UF" =====
+     Si está en modo manual → desactiva manual y consulta (es explícito). */
+  $('btnUF').addEventListener('click', async (ev) => {
+    const btn = ev.currentTarget;
+    if (btn.disabled) return;
+    btn.disabled = true;
+    try {
+      if (modoManualUF){
+        console.log('[UF] Actualizar UF desde modo manual → salir de manual');
+        desactivarModoManual();
+      }
+      const f = $('inpFecha').value || formatDateISO(new Date());
+      await consultarYAplicarUF(f, true, false);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  $('btnPrint').addEventListener('click', () => window.print());
+}
+
+/* Refresco automático. En modo manual NO hace nada. */
+const UF_REFRESH_MS = 6 * 60 * 60 * 1000;
+let ultimoFocusRefresh = 0;
+
+function programarRefrescoUF(){
+  setInterval(() => {
+    if (modoManualUF) return;
+    const f = $('inpFecha').value || formatDateISO(new Date());
+    consultarYAplicarUF(f, false, true);
+  }, UF_REFRESH_MS);
+
+  window.addEventListener('focus', () => {
+    if (modoManualUF) return;
+    const ahora = Date.now();
+    if (ahora - ultimoFocusRefresh < CONFIG.refreshFocusMin * 60 * 1000) return;
+    ultimoFocusRefresh = ahora;
+    const f = $('inpFecha').value || formatDateISO(new Date());
+    consultarYAplicarUF(f, false, true);
+  });
+}
+
+function init(){
+  const hoy = new Date();
+  $('fechaHoy').textContent = '📅 ' + hoy.toLocaleDateString('es-CL', { weekday:'short', day:'2-digit', month:'short', year:'numeric' });
+
+  if (!$('inpFecha').value){
+    $('inpFecha').value = formatDateISO(hoy);
+  }
+
+  restore();
+
+  if (!$('inpFecha').value || !/^\d{4}-\d{2}-\d{2}$/.test($('inpFecha').value)){
+    $('inpFecha').value = formatDateISO(hoy);
+  }
+
+  /* 1) Intentar cargar modo manual guardado (prioridad máxima) */
+  cargarModoManual();
+
+  /* 2) Si NO hay modo manual, cargar última UF guardada como valor visible temporal */
+  if (!modoManualUF){
+    const ultimaGuardada = cargarUltimaUF();
+    if (ultimaGuardada && ultimaGuardada.valor > 0){
+      $('inpUF').value = Number(ultimaGuardada.valor).toFixed(2);
+      $('ufStatus').textContent = 'Último valor guardado';
+      $('ufStatus').className = 'pill warn';
+      $('ufMeta').innerHTML = 'Guardado localmente · ' + formatDateCL(ultimaGuardada.fecha)
+        + '. Actualizando desde mindicador.cl…';
+    } else {
+      $('inpUF').value = '0.00';
+      $('ufStatus').textContent = 'Consultando…';
+      $('ufStatus').className = 'pill load';
+      $('ufMeta').textContent = 'Consultando mindicador.cl…';
+    }
+  }
+
+  ['inpUsdAduana','inpUsdAcuerdo','inpUF'].forEach(id => fmtDecimalInput($(id), 2));
+  fmtDecimalInput($('cifValor'), 2);
+  fmtDecimalInput($('cifTasa'), 2);
+
+  $('fechaMeta').textContent = '📅 Consulta para ' + formatDateCL($('inpFecha').value);
+
+  bindEvents();
+  actualizarMesAduanero($('inpFecha').value);
+  renderCodes();
+
+  const inicial = CODIGOS.find(x => x.c === '223.0');
+  if (inicial){ codigoActivo = inicial; renderCodes(); showCode(inicial); }
+
+  recalc();
+  recalcCIF();
+
+  /* 3) Consulta inicial: solo si NO está en modo manual */
+  if (!modoManualUF){
+    const hayValorPrevio = !!(ultimoUFValido.valor);
+    consultarYAplicarUF($('inpFecha').value, !hayValorPrevio, hayValorPrevio);
+  }
+
+  programarRefrescoUF();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
