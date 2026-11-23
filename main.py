@@ -1,4 +1,5 @@
 # main.py
+from fastapi.responses import FileResponse
 from datetime import date, timedelta
 from typing import Literal, Optional
 import httpx
@@ -16,6 +17,9 @@ app = FastAPI(
 
 # Permitir peticiones desde tu index.html local
 app.add_middleware(
+@app.get("/", include_in_schema=False)
+def servir_panel():
+    return FileResponse("index.html")
     CORSMiddleware,
     allow_origins=["*"],
     allow_methods=["*"],
